@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="enum, Option<T>, сопоставление с образцом match, if let.">
+<title>Перечисления и сопоставление с образцом — Rust: документация</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="index.html">🦀 Rust</a>
+    <span class="logo-sub">Документация языка</span>
+    <span class="badge">1.90 · stable</span>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" aria-label="Разделы документации">
+  <div class="nav-group">
+    <p class="nav-title">Начало работы</p>
+    <a href="index.html">Обзор</a>
+    <a href="installation.html">Установка</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Основы</p>
+    <a href="variables.html">Переменные</a>
+    <a href="types.html">Типы данных</a>
+    <a href="functions.html">Функции</a>
+    <a href="control-flow.html">Условия и циклы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Система владения</p>
+    <a href="ownership.html">Владение</a>
+    <a href="borrowing.html">Ссылки и срезы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Типы данных</p>
+    <a href="structs.html">Структуры</a>
+    <a class="active" href="enums-match.html">Перечисления и match</a>
+    <a href="collections.html">Коллекции</a>
+    <a href="generics-traits.html">Дженерики и трейты</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Практика</p>
+    <a href="errors.html">Обработка ошибок</a>
+    <a href="modules.html">Модули и cargo</a>
+    <a href="cheat-sheet.html">Шпаргалка</a>
+  </div>
+  </nav>
+  <main>
+    <h1>Перечисления и сопоставление с образцом</h1>
+    <p><b>Перечисление (enum)</b> — тип, значение которого может быть одним из
+    нескольких <b>вариантов</b>. Варианты могут нести данные, как структуры.</p>
+    
+    <h2>Определение enum</h2>
+    <pre><code class="lang-rust"><span class="kw">enum</span> <span class="ty">Message</span> {
+        <span class="ty">Quit</span>,                       <span class="com">// без данных</span>
+        <span class="ty">Move</span> { x: <span class="ty">i32</span>, y: <span class="ty">i32</span> },    <span class="com">// анонимная структура</span>
+        <span class="ty">Write</span>(<span class="ty">String</span>),              <span class="com">// одно поле</span>
+        <span class="ty">ChangeColor</span>(<span class="ty">u8</span>, <span class="ty">u8</span>, <span class="ty">u8</span>),    <span class="com">// кортеж</span>
+    }
+    
+    <span class="kw">impl</span> <span class="ty">Message</span> {
+        <span class="kw">fn</span> <span class="fn">call</span>(&amp;<span class="kw">self</span>) {
+            <span class="mac">println!</span>(<span class="str">"обработка сообщения"</span>);
+        }
+    }
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> m = <span class="ty">Message</span>::<span class="ty">Write</span>(<span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"привет"</span>));
+        m.<span class="fn">call</span>(); <span class="com">// методы доступны и у enum</span>
+    }</code></pre>
+    
+    <h2>Option — замена null</h2>
+    <p>В Rust нет <code>null</code>. «Отсутствие значения» выражается перечислением
+    <code>Option&lt;T&gt;</code> из стандартной библиотеки — и компилятор <b>заставляет</b>
+    обработать оба случая:</p>
+    <pre><code class="lang-rust"><span class="kw">let</span> some_number: <span class="ty">Option</span>&lt;<span class="ty">i32</span>&gt; = <span class="ty">Some</span>(<span class="num">5</span>);
+    <span class="kw">let</span> absent_number: <span class="ty">Option</span>&lt;<span class="ty">i32</span>&gt; = <span class="ty">None</span>;
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> x: <span class="ty">i32</span> = <span class="num">5</span>;
+        <span class="kw">let</span> y: <span class="ty">Option</span>&lt;<span class="ty">i32</span>&gt; = <span class="ty">Some</span>(<span class="num">3</span>);
+    
+        <span class="com">// let sum = x + y; // ОШИБКА: i32 и Option&lt;i32&gt; — разные типы</span>
+        <span class="kw">let</span> sum = x + y.<span class="fn">unwrap_or</span>(<span class="num">0</span>); <span class="com">// сначала «распаковать» значение</span>
+        <span class="mac">println!</span>(<span class="str">"sum = {}"</span>, sum);
+    }</code></pre>
+    
+    <h2>match — сопоставление с образцом</h2>
+    <p><code>match</code> перебирает шаблоны и <b>обязан покрыть все варианты</b>.
+    Внутри варианта данные можно связать с переменными:</p>
+    <pre><code class="lang-rust"><span class="attr">#[derive(Debug)]</span>
+    <span class="kw">enum</span> <span class="ty">Coin</span> {
+        <span class="ty">Penny</span>,
+        <span class="ty">Nickel</span>,
+        <span class="ty">Dime</span>,
+        <span class="ty">Quarter</span>(<span class="ty">String</span>), <span class="com">// редкая монета с именем штата</span>
+    }
+    
+    <span class="kw">fn</span> <span class="fn">value_in_cents</span>(coin: <span class="ty">Coin</span>) -&gt; <span class="ty">u32</span> {
+        <span class="kw">match</span> coin {
+            <span class="ty">Coin</span>::<span class="ty">Penny</span> =&gt; {
+                <span class="mac">println!</span>(<span class="str">"Счастливая монетка!"</span>);
+                <span class="num">1</span>
+            }
+            <span class="ty">Coin</span>::<span class="ty">Nickel</span> =&gt; <span class="num">5</span>,
+            <span class="ty">Coin</span>::<span class="ty">Dime</span> =&gt; <span class="num">10</span>,
+            <span class="ty">Coin</span>::<span class="ty">Quarter</span>(state) =&gt; {
+                <span class="mac">println!</span>(<span class="str">"Штат: {}"</span>, state);
+                <span class="num">25</span>
+            }
+        }
+    }
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="mac">println!</span>(<span class="str">"{}"</span>, <span class="fn">value_in_cents</span>(<span class="ty">Coin</span>::<span class="ty">Quarter</span>(<span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"Alaska"</span>))));
+    }</code></pre>
+    <p>Match с <code>Option</code>:</p>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">plus_one</span>(x: <span class="ty">Option</span>&lt;<span class="ty">i32</span>&gt;) -&gt; <span class="ty">Option</span>&lt;<span class="ty">i32</span>&gt; {
+        <span class="kw">match</span> x {
+            <span class="ty">Some</span>(i) =&gt; <span class="ty">Some</span>(i + <span class="num">1</span>),
+            <span class="ty">None</span> =&gt; <span class="ty">None</span>, <span class="com">// пропустить ветку нельзя — не скомпилируется</span>
+        }
+    }</code></pre>
+    <p>Шаблон <code>_</code> — «всё остальное» (аналог <code>default</code> в switch):</p>
+    <pre><code class="lang-rust"><span class="kw">let</span> dice = <span class="num">9</span>;
+    <span class="kw">match</span> dice {
+        <span class="num">3</span> =&gt; <span class="mac">println!</span>(<span class="str">"добавить шляпу"</span>),
+        <span class="num">7</span> =&gt; <span class="mac">println!</span>(<span class="str">"убрать шляпу"</span>),
+        _ =&gt; <span class="mac">println!</span>(<span class="str">"ничего не делать"</span>),
+    }</code></pre>
+    
+    <h2>if let — короткая запись</h2>
+    <p>Когда интересен только один шаблон, вместо <code>match</code> удобнее <code>if let</code>:</p>
+    <pre><code class="lang-rust"><span class="kw">let</span> config_max: <span class="ty">Option</span>&lt;<span class="ty">u8</span>&gt; = <span class="ty">Some</span>(<span class="num">3</span>);
+    
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ty">Some</span>(max) = config_max {
+        <span class="mac">println!</span>(<span class="str">"Максимум: {}"</span>, max);
+    }</code></pre>
+    
+    <h2>Ключевые моменты</h2>
+    <ul>
+      <li>Варианты enum могут нести данные разных форм.</li>
+      <li><code>Option&lt;T&gt;</code> делает «null-ошибки» невозможными: пустое значение придётся обработать явно.</li>
+      <li><code>match</code> исчерпывающий; <code>if let</code> — синтаксический сахар для одного случая.</li>
+    </ul>
+    <div class="pager"><a class="prev" href="structs.html"><span>← Назад</span><b>Структуры</b></a><a class="next" href="collections.html"><span>Далее →</span><b>Коллекции</b></a></div>
+  </main>
+</div>
+<footer class="site-footer">
+  <p>Учебный проект RolliBow, все права защищены</p>
+</footer>
+</body>
+</html>

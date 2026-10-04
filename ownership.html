@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Правила владения, перемещение (move), клонирование и Copy-типы в Rust.">
+<title>Владение (ownership) — Rust: документация</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="index.html">🦀 Rust</a>
+    <span class="logo-sub">Документация языка</span>
+    <span class="badge">1.90 · stable</span>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" aria-label="Разделы документации">
+  <div class="nav-group">
+    <p class="nav-title">Начало работы</p>
+    <a href="index.html">Обзор</a>
+    <a href="installation.html">Установка</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Основы</p>
+    <a href="variables.html">Переменные</a>
+    <a href="types.html">Типы данных</a>
+    <a href="functions.html">Функции</a>
+    <a href="control-flow.html">Условия и циклы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Система владения</p>
+    <a class="active" href="ownership.html">Владение</a>
+    <a href="borrowing.html">Ссылки и срезы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Типы данных</p>
+    <a href="structs.html">Структуры</a>
+    <a href="enums-match.html">Перечисления и match</a>
+    <a href="collections.html">Коллекции</a>
+    <a href="generics-traits.html">Дженерики и трейты</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Практика</p>
+    <a href="errors.html">Обработка ошибок</a>
+    <a href="modules.html">Модули и cargo</a>
+    <a href="cheat-sheet.html">Шпаргалка</a>
+  </div>
+  </nav>
+  <main>
+    <h1>Владение (ownership)</h1>
+    <p>Владение — ключевая особенность Rust, которая обеспечивает безопасность памяти
+    <b>без сборщика мусора</b>. Компилятор проверяет три правила:</p>
+    <ol>
+      <li>У каждого значения есть <b>владелец</b> — переменная.</li>
+      <li>Владелец у значения <b>только один</b>.</li>
+      <li>Когда владелец выходит из области видимости, значение <b>уничтожается</b> (вызывается <code>drop</code>).</li>
+    </ol>
+    
+    <h2>Стек и куча</h2>
+    <p>Типы известного размера (<code>i32</code>, <code>bool</code>, массивы) живут в <b>стеке</b> и копируются
+    дешёво. <code>String</code> хранит данные в <b>куче</b>: её размер заранее неизвестен.</p>
+    <pre><code class="lang-rust"><span class="kw">let</span> s = <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"привет"</span>); <span class="com">// данные в куче</span>
+    <span class="kw">let</span> n = <span class="num">42</span>;                     <span class="com">// значение в стеке</span></code></pre>
+    
+    <h2>Перемещение (move)</h2>
+    <p>Присваивание данных из кучи <b>перемещает</b> владение — старая переменная
+    становится недействительной. Это исключает двойное освобождение памяти:</p>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> s1 = <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"привет"</span>);
+        <span class="kw">let</span> s2 = s1;               <span class="com">// владение перемещено в s2</span>
+    
+        <span class="com">// println!("{}", s1);     // ОШИБКА: value borrowed after move</span>
+        <span class="mac">println!</span>(<span class="str">"{}"</span>, s2);        <span class="com">// ОК</span>
+    }</code></pre>
+    
+    <h2>Клонирование</h2>
+    <p>Если нужны <b>две независимые копии</b> данных в куче — используйте <code>clone()</code>:</p>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> s1 = <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"привет"</span>);
+        <span class="kw">let</span> s2 = s1.<span class="fn">clone</span>();       <span class="com">// глубокое копирование данных кучи</span>
+        <span class="mac">println!</span>(<span class="str">"s1 = {}, s2 = {}"</span>, s1, s2); <span class="com">// обе действительны</span>
+    }</code></pre>
+    
+    <h2>Copy-типы</h2>
+    <p>Типы, целиком живущие в стеке, помечены трейтом <code>Copy</code>: они копируются
+    при присваивании, а не перемещаются. Это все скаляры, <code>char</code>, <code>bool</code>
+    и кортежи/массивы из Copy-типов:</p>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> x = <span class="num">5</span>;
+        <span class="kw">let</span> y = x;                 <span class="com">// копирование, а не move</span>
+        <span class="mac">println!</span>(<span class="str">"x = {}, y = {}"</span>, x, y); <span class="com">// обе переменные действительны</span>
+    }</code></pre>
+    
+    <h2>Владение и функции</h2>
+    <p>Передача аргумента работает как присваивание: значение перемещается в функцию
+    или возвращается из неё:</p>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">takes_ownership</span>(s: <span class="ty">String</span>) {
+        <span class="mac">println!</span>(<span class="str">"{}"</span>, s);
+    } <span class="com">// s выходит из области видимости → память освобождается</span>
+    
+    <span class="kw">fn</span> <span class="fn">makes_copy</span>(n: <span class="ty">i32</span>) {
+        <span class="mac">println!</span>(<span class="str">"{}"</span>, n);
+    } <span class="com">// n — Copy-тип, ничего не освобождается</span>
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> s = <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"привет"</span>);
+        <span class="fn">takes_ownership</span>(s);        <span class="com">// s перемещена</span>
+        <span class="com">// println!("{}", s);      // ОШИБКА: s больше не действительна</span>
+    
+        <span class="kw">let</span> x = <span class="num">10</span>;
+        <span class="fn">makes_copy</span>(x);             <span class="com">// x скопирован</span>
+        <span class="mac">println!</span>(<span class="str">"{}"</span>, x);         <span class="com">// ОК</span>
+    }</code></pre>
+    
+    <h2>Ключевые моменты</h2>
+    <ul>
+      <li>Присваивание и передача аргументов для кучевых данных — это <b>move</b>.</li>
+      <li><code>clone()</code> — явное глубокое копирование, когда move не подходит.</li>
+      <li>Стек-типы с трейтом <code>Copy</code> копируются автоматически.</li>
+      <li>Память освобождается ровно один раз — когда владелец выходит из области видимости.</li>
+    </ul>
+    <div class="pager"><a class="prev" href="control-flow.html"><span>← Назад</span><b>Условия и циклы</b></a><a class="next" href="borrowing.html"><span>Далее →</span><b>Ссылки и срезы</b></a></div>
+  </main>
+</div>
+<footer class="site-footer">
+  <p>Учебный проект RolliBow, все права защищены</p>
+</footer>
+</body>
+</html>

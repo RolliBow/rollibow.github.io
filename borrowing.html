@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Иммутабельные и мутабельные ссылки, правила заимствования, срезы &str и времени жизни.">
+<title>Заимствование, ссылки и срезы — Rust: документация</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="index.html">🦀 Rust</a>
+    <span class="logo-sub">Документация языка</span>
+    <span class="badge">1.90 · stable</span>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" aria-label="Разделы документации">
+  <div class="nav-group">
+    <p class="nav-title">Начало работы</p>
+    <a href="index.html">Обзор</a>
+    <a href="installation.html">Установка</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Основы</p>
+    <a href="variables.html">Переменные</a>
+    <a href="types.html">Типы данных</a>
+    <a href="functions.html">Функции</a>
+    <a href="control-flow.html">Условия и циклы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Система владения</p>
+    <a href="ownership.html">Владение</a>
+    <a class="active" href="borrowing.html">Ссылки и срезы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Типы данных</p>
+    <a href="structs.html">Структуры</a>
+    <a href="enums-match.html">Перечисления и match</a>
+    <a href="collections.html">Коллекции</a>
+    <a href="generics-traits.html">Дженерики и трейты</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Практика</p>
+    <a href="errors.html">Обработка ошибок</a>
+    <a href="modules.html">Модули и cargo</a>
+    <a href="cheat-sheet.html">Шпаргалка</a>
+  </div>
+  </nav>
+  <main>
+    <h1>Заимствование, ссылки и срезы</h1>
+    <p><b>Ссылка</b> <code>&amp;T</code> позволяет пользоваться значением, <b>не забирая владение</b>.
+    Это называется <b>заимствованием (borrowing)</b>: как и в жизни, взяв книгу у друга,
+    вы обязаны её вернуть.</p>
+    
+    <h2>Иммутабельные ссылки</h2>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">calculate_length</span>(s: &amp;<span class="ty">String</span>) -&gt; <span class="ty">usize</span> {
+        s.<span class="fn">len</span>()
+    } <span class="com">// s выходит из области видимости, но значение НЕ уничтожается — оно не её</span>
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> s1 = <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"привет"</span>);
+        <span class="kw">let</span> len = <span class="fn">calculate_length</span>(&amp;s1);       <span class="com">// заимствование</span>
+        <span class="mac">println!</span>(<span class="str">"Длина '{}' — {}"</span>, s1, len);  <span class="com">// s1 по-прежнему действительна</span>
+    }</code></pre>
+    
+    <h2>Мутабельные ссылки</h2>
+    <p>Ссылка <code>&amp;mut T</code> позволяет изменять заимствованное значение:</p>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">change</span>(s: &amp;<span class="kw">mut</span> <span class="ty">String</span>) {
+        s.<span class="fn">push_str</span>(<span class="str">", мир"</span>);
+    }
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> <span class="kw">mut</span> s = <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"привет"</span>); <span class="com">// сама переменная тоже mut</span>
+        <span class="fn">change</span>(&amp;<span class="kw">mut</span> s);
+        <span class="mac">println!</span>(<span class="str">"{}"</span>, s); <span class="com">// привет, мир</span>
+    }</code></pre>
+    
+    <h2>Правила заимствования</h2>
+    <div class="warn">
+      <p>В любой момент времени существует <b>либо одна мутабельная</b> ссылка,
+      <b>либо любое число иммутабельных</b>. Ссылки всегда должны быть действительны
+      (никаких висячих указателей).</p>
+    </div>
+    <pre><code class="lang-rust"><span class="kw">let</span> <span class="kw">mut</span> s = <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"привет"</span>);
+    
+    <span class="kw">let</span> r1 = &amp;s;      <span class="com">// ОК</span>
+    <span class="kw">let</span> r2 = &amp;s;      <span class="com">// ОК: сколько угодно иммутабельных</span>
+    <span class="com">// let r3 = &amp;mut s; // ОШИБКА: нельзя &amp;mut, пока существуют &amp;</span>
+    <span class="mac">println!</span>(<span class="str">"{}, {}"</span>, r1, r2);
+    
+    <span class="kw">let</span> r3 = &amp;<span class="kw">mut</span> s;  <span class="com">// ОК: иммутабельные больше не используются (NLL)</span>
+    r3.<span class="fn">push_str</span>(<span class="str">"!"</span>);
+    <span class="mac">println!</span>(<span class="str">"{}"</span>, r3);</code></pre>
+    <p>Эти правила отсекают <b>гонки данных</b> на этапе компиляции: невозможно,
+    чтобы один код читал значение, которое другой код параллельно изменяет.</p>
+    
+    <h2>Срезы</h2>
+    <p><b>Срез</b> — ссылка на непрерывную часть последовательности:</p>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> s = <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"привет мир"</span>);
+        <span class="kw">let</span> hello = &amp;s[<span class="num">0</span>..<span class="num">6</span>];   <span class="com">// срез первых байт... осторожнее с UTF-8!</span>
+        <span class="kw">let</span> ascii = <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"hello world"</span>);
+        <span class="kw">let</span> word = &amp;ascii[<span class="num">0</span>..<span class="num">5</span>];
+        <span class="mac">println!</span>(<span class="str">"{} {}"</span>, word, hello.<span class="fn">len</span>());
+    }</code></pre>
+    <p>Строковый срез <code>&amp;str</code> — самый практичный тип параметров для строк:
+    функция принимает и <code>String</code>, и строковые литералы:</p>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">first_word</span>(s: &amp;<span class="ty">str</span>) -&gt; &amp;<span class="ty">str</span> {
+        <span class="kw">let</span> bytes = s.<span class="fn">as_bytes</span>();
+        <span class="kw">for</span> (i, &amp;byte) <span class="kw">in</span> bytes.<span class="fn">iter</span>().<span class="fn">enumerate</span>() {
+            <span class="kw">if</span> byte == b<span class="str">' '</span> {
+                <span class="kw">return</span> &amp;s[..i];
+            }
+        }
+        &amp;s[..]
+    }
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> s = <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"привет мир"</span>);
+        <span class="mac">println!</span>(<span class="str">"{}"</span>, <span class="fn">first_word</span>(&amp;s));     <span class="com">// из String</span>
+        <span class="mac">println!</span>(<span class="str">"{}"</span>, <span class="fn">first_word</span>(<span class="str">"hello world"</span>)); <span class="com">// из литерала</span>
+    }</code></pre>
+    
+    <h2>Времена жизни (кратко)</h2>
+    <p>Когда функция возвращает ссылку, компилятору нужна подсказка, из какого
+    аргумента она происходит — это <b>аннотация времени жизни</b> <code>'a</code>:</p>
+    <pre><code class="lang-rust"><span class="kw">fn</span> longest&lt;<span class="life">'a</span>&gt;(x: &amp;<span class="life">'a</span> <span class="ty">str</span>, y: &amp;<span class="life">'a</span> <span class="ty">str</span>) -&gt; &amp;<span class="life">'a</span> <span class="ty">str</span> {
+        <span class="kw">if</span> x.<span class="fn">len</span>() &gt; y.<span class="fn">len</span>() { x } <span class="kw">else</span> { y }
+    }</code></pre>
+    
+    <h2>Ключевые моменты</h2>
+    <ul>
+      <li>Ссылки заимствуют значение: владение остаётся у владельца.</li>
+      <li>Одна <code>&amp;mut</code> ИЛИ много <code>&amp;</code> — иначе ошибка компиляции.</li>
+      <li>В сигнатурах функций предпочитайте <code>&amp;str</code> вместо <code>&amp;String</code>.</li>
+    </ul>
+    <div class="pager"><a class="prev" href="ownership.html"><span>← Назад</span><b>Владение</b></a><a class="next" href="structs.html"><span>Далее →</span><b>Структуры</b></a></div>
+  </main>
+</div>
+<footer class="site-footer">
+  <p>Учебный проект RolliBow, все права защищены</p>
+</footer>
+</body>
+</html>

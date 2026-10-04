@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Краткая сводка синтаксиса Rust: переменные, функции, владение, коллекции, ошибки, трейты.">
+<title>Шпаргалка по синтаксису — Rust: документация</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="index.html">🦀 Rust</a>
+    <span class="logo-sub">Документация языка</span>
+    <span class="badge">1.90 · stable</span>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" aria-label="Разделы документации">
+  <div class="nav-group">
+    <p class="nav-title">Начало работы</p>
+    <a href="index.html">Обзор</a>
+    <a href="installation.html">Установка</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Основы</p>
+    <a href="variables.html">Переменные</a>
+    <a href="types.html">Типы данных</a>
+    <a href="functions.html">Функции</a>
+    <a href="control-flow.html">Условия и циклы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Система владения</p>
+    <a href="ownership.html">Владение</a>
+    <a href="borrowing.html">Ссылки и срезы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Типы данных</p>
+    <a href="structs.html">Структуры</a>
+    <a href="enums-match.html">Перечисления и match</a>
+    <a href="collections.html">Коллекции</a>
+    <a href="generics-traits.html">Дженерики и трейты</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Практика</p>
+    <a href="errors.html">Обработка ошибок</a>
+    <a href="modules.html">Модули и cargo</a>
+    <a class="active" href="cheat-sheet.html">Шпаргалка</a>
+  </div>
+  </nav>
+  <main>
+    <h1>Шпаргалка по синтаксису</h1>
+    <p>Страница со всем базовым синтаксисом.</p>
+    
+    <h2>Переменные</h2>
+    <pre><code class="lang-rust"><span class="kw">let</span> x = <span class="num">5</span>;                    <span class="com">// неизменяемая</span>
+    <span class="kw">let</span> <span class="kw">mut</span> y = <span class="num">10</span>;               <span class="com">// изменяемая</span>
+    <span class="kw">const</span> <span class="ty">MAX</span>: <span class="ty">u32</span> = <span class="num">100_000</span>;     <span class="com">// константа</span>
+    <span class="kw">let</span> x = <span class="str">"тень"</span>;               <span class="com">// shadowing — новая переменная</span></code></pre>
+    
+    <h2>Функции и замыкания</h2>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">add</span>(a: <span class="ty">i32</span>, b: <span class="ty">i32</span>) -&gt; <span class="ty">i32</span> { a + b }
+    
+    <span class="kw">let</span> plus = |a: <span class="ty">i32</span>, b: <span class="ty">i32</span>| a + b;  <span class="com">// замыкание</span>
+    <span class="kw">let</span> doubled: <span class="ty">Vec</span>&lt;<span class="ty">i32</span>&gt; = (<span class="num">1</span>..<span class="num">4</span>).<span class="fn">map</span>(|x| x * <span class="num">2</span>).<span class="fn">collect</span>();</code></pre>
+    
+    <h2>Управление потоком</h2>
+    <pre><code class="lang-rust"><span class="kw">if</span> n &gt; <span class="num">0</span> { /* ... */ } <span class="kw">else</span> <span class="kw">if</span> n == <span class="num">0</span> { /* ... */ } <span class="kw">else</span> { /* ... */ }
+    <span class="kw">let</span> sign = <span class="kw">if</span> n &lt; <span class="num">0</span> { -<span class="num">1</span> } <span class="kw">else</span> { <span class="num">1</span> };      <span class="com">// if как выражение</span>
+    
+    <span class="kw">loop</span> { <span class="kw">break</span>; }                              <span class="com">// бесконечный</span>
+    <span class="kw">while</span> cond { /* ... */ }
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="num">0</span>..<span class="num">10</span> { /* ... */ }                 <span class="com">// 0..10 — полуинтервал</span>
+    <span class="kw">for</span> v <span class="kw">in</span> &amp;collection { /* ... */ }
+    
+    <span class="kw">match</span> value {
+        <span class="num">1</span> | <span class="num">2</span> =&gt; <span class="str">"один или два"</span>,
+        <span class="num">3</span>..=<span class="num">9</span> =&gt; <span class="str">"от трёх до девяти"</span>,
+        n <span class="kw">if</span> n &gt; <span class="num">100</span> =&gt; <span class="str">"больше ста"</span>,            <span class="com">// guard</span>
+        _ =&gt; <span class="str">"остальное"</span>,
+    }</code></pre>
+    
+    <h2>Владение и ссылки</h2>
+    <pre><code class="lang-rust"><span class="kw">let</span> s1 = <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"a"</span>);
+    <span class="kw">let</span> s2 = s1;              <span class="com">// move: s1 больше не действительна</span>
+    <span class="kw">let</span> s3 = s2.<span class="fn">clone</span>();      <span class="com">// явная копия</span>
+    <span class="kw">let</span> r = &amp;s3;              <span class="com">// иммутабельное заимствование</span>
+    <span class="kw">let</span> <span class="kw">mut</span> s4 = <span class="ty">String</span>::<span class="fn">new</span>();
+    <span class="kw">let</span> m = &amp;<span class="kw">mut</span> s4;          <span class="com">// мутабельное заимствование (единственное!)</span>
+    <span class="kw">let</span> slice = &amp;s3[<span class="num">0</span>..<span class="num">1</span>];    <span class="com">// срез &amp;str</span></code></pre>
+    
+    <h2>Типы-конструкторы</h2>
+    <pre><code class="lang-rust"><span class="kw">struct</span> <span class="ty">Point</span> { x: <span class="ty">i32</span>, y: <span class="ty">i32</span> }
+    <span class="kw">enum</span> <span class="ty">Shape</span> { <span class="ty">Circle</span>(<span class="ty">f64</span>), <span class="ty">Rect</span> { w: <span class="ty">f64</span>, h: <span class="ty">f64</span> } }
+    
+    <span class="kw">impl</span> <span class="ty">Point</span> {
+        <span class="kw">fn</span> <span class="fn">new</span>(x: <span class="ty">i32</span>, y: <span class="ty">i32</span>) -&gt; <span class="kw">Self</span> { <span class="kw">Self</span> { x, y } }
+        <span class="kw">fn</span> <span class="fn">norm</span>(&amp;<span class="kw">self</span>) -&gt; <span class="ty">f64</span> { ((<span class="kw">self</span>.x * <span class="kw">self</span>.x + <span class="kw">self</span>.y * <span class="kw">self</span>.y) <span class="kw">as</span> <span class="ty">f64</span>).<span class="fn">sqrt</span>() }
+    }
+    
+    <span class="kw">trait</span> <span class="ty">Area</span> { <span class="kw">fn</span> <span class="fn">area</span>(&amp;<span class="kw">self</span>) -&gt; <span class="ty">f64</span>; }
+    <span class="kw">impl</span> <span class="ty">Area</span> <span class="kw">for</span> <span class="ty">Shape</span> {
+        <span class="kw">fn</span> <span class="fn">area</span>(&amp;<span class="kw">self</span>) -&gt; <span class="ty">f64</span> {
+            <span class="kw">match</span> <span class="kw">self</span> {
+                <span class="ty">Shape</span>::<span class="ty">Circle</span>(r) =&gt; std::<span class="ty">f64</span>::consts::<span class="ty">PI</span> * r * r,
+                <span class="ty">Shape</span>::<span class="ty">Rect</span> { w, h } =&gt; w * h,
+            }
+        }
+    }</code></pre>
+    
+    <h2>Коллекции</h2>
+    <pre><code class="lang-rust"><span class="kw">let</span> <span class="kw">mut</span> v = <span class="mac">vec!</span>[<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>];
+    v.<span class="fn">push</span>(<span class="num">4</span>);
+    <span class="kw">let</span> maybe = v.<span class="fn">get</span>(<span class="num">99</span>);                  <span class="com">// Option&lt;&amp;i32&gt;</span>
+    
+    <span class="kw">let</span> <span class="kw">mut</span> s = <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"ab"</span>);
+    s.<span class="fn">push_str</span>(<span class="str">"cd"</span>); s.<span class="fn">push</span>(<span class="str">'e'</span>);
+    
+    <span class="kw">let</span> <span class="kw">mut</span> map = std::collections::<span class="ty">HashMap</span>::<span class="fn">new</span>();
+    map.<span class="fn">insert</span>(<span class="str">"k"</span>, <span class="num">1</span>);
+    <span class="kw">let</span> val = map.<span class="fn">get</span>(<span class="str">"k"</span>).<span class="fn">copied</span>().<span class="fn">unwrap_or</span>(<span class="num">0</span>);</code></pre>
+    
+    <h2>Ошибки</h2>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">parse</span>(s: &amp;<span class="ty">str</span>) -&gt; <span class="ty">Result</span>&lt;<span class="ty">i32</span>, std::num::<span class="ty">ParseIntError</span>&gt; {
+        <span class="kw">let</span> n: <span class="ty">i32</span> = s.<span class="fn">trim</span>().<span class="fn">parse</span>()?;     <span class="com">// ? — проброс ошибки</span>
+        <span class="ty">Ok</span>(n * <span class="num">2</span>)
+    }
+    
+    <span class="kw">let</span> ok = <span class="fn">parse</span>(<span class="str">"21"</span>).<span class="fn">unwrap_or</span>(-<span class="num">1</span>);
+    <span class="mac">panic!</span>(<span class="str">"неисправимая ситуация"</span>);</code></pre>
+    
+    <h2>Полезные макросы</h2>
+    <pre><code class="lang-rust"><span class="mac">println!</span>(<span class="str">"{} {:?} {:#?}"</span>, x, v, user);  <span class="com">// обычный / Debug / pretty</span>
+    <span class="kw">let</span> s = <span class="mac">format!</span>(<span class="str">"{} = {}"</span>, <span class="str">"x"</span>, <span class="num">5</span>);     <span class="com">// как println!, но в String</span>
+    <span class="kw">let</span> nums = <span class="mac">vec!</span>[<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>];               <span class="com">// быстрый Vec</span>
+    <span class="mac">assert_eq!</span>(<span class="num">2</span> + <span class="num">2</span>, <span class="num">4</span>);                   <span class="com">// тестовая проверка</span>
+    <span class="mac">dbg!</span>(&amp;nums);                            <span class="com">// отладочный вывод с местом</span></code></pre>
+    
+    <div class="note">
+      <p><b>Что дальше?</b> Полная книга — «The Rust Programming Language» (есть перевод),
+      справочник std — <code>doc.rust-lang.org/std</code>, задачник — «Rust By Example»
+      и «Rustlings».</p>
+    </div>
+    <div class="pager"><a class="prev" href="modules.html"><span>← Назад</span><b>Модули и cargo</b></a></div>
+  </main>
+</div>
+<footer class="site-footer">
+  <p>Учебный проект RolliBow, все права защищены</p>
+</footer>
+</body>
+</html>

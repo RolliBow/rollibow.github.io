@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Система модулей Rust: пакеты, крейты, mod, pub, use и зависимости в Cargo.toml.">
+<title>Модули, пути и cargo — Rust: документация</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="index.html">🦀 Rust</a>
+    <span class="logo-sub">Документация языка</span>
+    <span class="badge">1.90 · stable</span>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" aria-label="Разделы документации">
+  <div class="nav-group">
+    <p class="nav-title">Начало работы</p>
+    <a href="index.html">Обзор</a>
+    <a href="installation.html">Установка</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Основы</p>
+    <a href="variables.html">Переменные</a>
+    <a href="types.html">Типы данных</a>
+    <a href="functions.html">Функции</a>
+    <a href="control-flow.html">Условия и циклы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Система владения</p>
+    <a href="ownership.html">Владение</a>
+    <a href="borrowing.html">Ссылки и срезы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Типы данных</p>
+    <a href="structs.html">Структуры</a>
+    <a href="enums-match.html">Перечисления и match</a>
+    <a href="collections.html">Коллекции</a>
+    <a href="generics-traits.html">Дженерики и трейты</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Практика</p>
+    <a href="errors.html">Обработка ошибок</a>
+    <a class="active" href="modules.html">Модули и cargo</a>
+    <a href="cheat-sheet.html">Шпаргалка</a>
+  </div>
+  </nav>
+  <main>
+    <h1>Модули, пути и cargo</h1>
+    <p>Иерархия организации кода в Rust:</p>
+    <table>
+      <tr><th>Понятие</th><th>Определение</th></tr>
+      <tr><td><b>Пакет (package)</b></td><td>Проект cargo: один <code>Cargo.toml</code>, до одного бинарного и сколько угодно библиотечных крейтов</td></tr>
+      <tr><td><b>Крейт (crate)</b></td><td>Дерево кода, которое компилируется за раз: бинарник (<code>main.rs</code>) или библиотека (<code>lib.rs</code>)</td></tr>
+      <tr><td><b>Модуль (mod)</b></td><td>Группировка элементов внутри крейта + управление видимостью</td></tr>
+    </table>
+    
+    <h2>Объявление модулей</h2>
+    <pre><code class="lang-rust"><span class="com">// src/lib.rs</span>
+    <span class="kw">mod</span> front_of_house {
+        <span class="kw">pub</span> <span class="kw">mod</span> hosting {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="fn">add_to_waitlist</span>() {}
+    
+            <span class="kw">fn</span> <span class="fn">seat_at_table</span>() {} <span class="com">// приватная функция</span>
+        }
+    }
+    
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="fn">eat_at_restaurant</span>() {
+        <span class="com">// Абсолютный путь — от корня крейта</span>
+        <span class="kw">crate</span>::front_of_house::hosting::<span class="fn">add_to_waitlist</span>();
+    
+        <span class="com">// Относительный путь — от текущего модуля</span>
+        front_of_house::hosting::<span class="fn">add_to_waitlist</span>();
+    }</code></pre>
+    <p>Без <code>pub</code> элементы модуля приватны — вложенность <code>hosting</code> снаружи
+    недоступна. Правило: <code>pub</code> открывает элемент, но все его <b>родительские
+    модули</b> тоже должны быть доступны.</p>
+    
+    <h2>use — импорт путей</h2>
+    <pre><code class="lang-rust"><span class="kw">use</span> std::collections::<span class="ty">HashMap</span>;        <span class="com">// импортировать тип</span>
+    <span class="kw">use</span> std::fmt::<span class="ty">Display</span> <span class="kw">as</span> <span class="ty">Disp</span>;        <span class="com">// псевдоним</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::front_of_house::hosting; <span class="com">// публичный ре-экспорт</span>
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> <span class="kw">mut</span> map = <span class="ty">HashMap</span>::<span class="fn">new</span>();
+        map.<span class="fn">insert</span>(<span class="str">"ключ"</span>, <span class="num">42</span>);
+        hosting::<span class="fn">add_to_waitlist</span>();
+        <span class="mac">println!</span>(<span class="str">"{:?}"</span>, map);
+    }</code></pre>
+    <p>Идиома: функции импортируют вместе с родительским модулем
+    (<code>use std::io;</code> → <code>io::Result</code>), а типы — напрямую.</p>
+    
+    <h2>Модули в отдельных файлах</h2>
+    <pre><code class="lang-text">src/
+    ├── lib.rs                 # mod front_of_house; + корень дерева
+    └── front_of_house/
+        ├── mod.rs (или front_of_house.rs)
+        └── hosting.rs         # mod hosting; внутри front_of_house</code></pre>
+    <pre><code class="lang-rust"><span class="com">// src/lib.rs — тело модуля вынесено в файл</span>
+    <span class="kw">pub</span> <span class="kw">mod</span> front_of_house;
+    
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::front_of_house::hosting;
+    
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="fn">eat_at_restaurant</span>() {
+        hosting::<span class="fn">add_to_waitlist</span>();
+    }</code></pre>
+    
+    <h2>Зависимости в Cargo.toml</h2>
+    <pre><code class="lang-text">[package]
+    name = "my_app"
+    version = "0.1.0"
+    edition = "2021"
+    
+    [dependencies]
+    rand = "0.8"        # с crates.io
+    serde = { version = "1.0", features = ["derive"] }</code></pre>
+    <pre><code class="lang-rust"><span class="kw">use</span> rand::<span class="ty">Rng</span>;
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> n: <span class="ty">u8</span> = rand::<span class="fn">thread_rng</span>().<span class="fn">gen_range</span>(<span class="num">1</span>..=<span class="num">6</span>);
+        <span class="mac">println!</span>(<span class="str">"Кубик выпал: {}"</span>, n);
+    }</code></pre>
+    
+    <h2>Ключевые моменты</h2>
+    <ul>
+      <li>Пакет ⊃ крейты ⊃ модули; видимость управляется <code>pub</code>.</li>
+      <li>Пути бывают абсолютные (<code>crate::</code>) и относительные.</li>
+      <li>Один модуль = один файл (или каталог) — конвенция раскладки кода.</li>
+    </ul>
+    <div class="pager"><a class="prev" href="errors.html"><span>← Назад</span><b>Обработка ошибок</b></a><a class="next" href="cheat-sheet.html"><span>Далее →</span><b>Шпаргалка</b></a></div>
+  </main>
+</div>
+<footer class="site-footer">
+  <p>Учебный проект RolliBow, все права защищены</p>
+</footer>
+</body>
+</html>

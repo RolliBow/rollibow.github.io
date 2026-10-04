@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Динамические массивы Vec, строки String и хеш-таблицы HashMap в Rust.">
+<title>Коллекции: Vec, String, HashMap — Rust: документация</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="index.html">🦀 Rust</a>
+    <span class="logo-sub">Документация языка</span>
+    <span class="badge">1.90 · stable</span>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" aria-label="Разделы документации">
+  <div class="nav-group">
+    <p class="nav-title">Начало работы</p>
+    <a href="index.html">Обзор</a>
+    <a href="installation.html">Установка</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Основы</p>
+    <a href="variables.html">Переменные</a>
+    <a href="types.html">Типы данных</a>
+    <a href="functions.html">Функции</a>
+    <a href="control-flow.html">Условия и циклы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Система владения</p>
+    <a href="ownership.html">Владение</a>
+    <a href="borrowing.html">Ссылки и срезы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Типы данных</p>
+    <a href="structs.html">Структуры</a>
+    <a href="enums-match.html">Перечисления и match</a>
+    <a class="active" href="collections.html">Коллекции</a>
+    <a href="generics-traits.html">Дженерики и трейты</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Практика</p>
+    <a href="errors.html">Обработка ошибок</a>
+    <a href="modules.html">Модули и cargo</a>
+    <a href="cheat-sheet.html">Шпаргалка</a>
+  </div>
+  </nav>
+  <main>
+    <h1>Коллекции: Vec, String, HashMap</h1>
+    <p>В отличие от массива и кортежа, коллекции хранятся в <b>куче</b>, а их размер
+    может меняться во время выполнения.</p>
+    
+    <h2>Vec&lt;T&gt; — динамический массив</h2>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> <span class="kw">mut</span> v: <span class="ty">Vec</span>&lt;<span class="ty">i32</span>&gt; = <span class="ty">Vec</span>::<span class="fn">new</span>();
+        v.<span class="fn">push</span>(<span class="num">5</span>);
+        v.<span class="fn">push</span>(<span class="num">6</span>);
+        v.<span class="fn">push</span>(<span class="num">7</span>);
+    
+        <span class="kw">let</span> v2 = <span class="mac">vec!</span>[<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>];       <span class="com">// макрос с начальными значениями</span>
+    
+        <span class="kw">let</span> third = &amp;v2[<span class="num">2</span>];           <span class="com">// индексация: паника при выходе за границы</span>
+        <span class="kw">let</span> safe = v2.<span class="fn">get</span>(<span class="num">2</span>);         <span class="com">// Option&lt;&amp;i32&gt;: None вместо паники</span>
+    
+        <span class="mac">println!</span>(<span class="str">"{} {:?}"</span>, third, safe);
+    
+        <span class="kw">for</span> item <span class="kw">in</span> &amp;v2 {             <span class="com">// итерация по ссылке</span>
+            <span class="mac">print!</span>(<span class="str">"{} "</span>, item);
+        }
+        <span class="mac">println!</span>();
+    
+        <span class="kw">for</span> item <span class="kw">in</span> &amp;<span class="kw">mut</span> v {          <span class="com">// мутабельная итерация</span>
+            *item *= <span class="num">10</span>;
+        }
+        <span class="mac">println!</span>(<span class="str">"{:?}"</span>, v);          <span class="com">// [50, 60, 70]</span>
+    }</code></pre>
+    
+    <h2>String — растущая строка</h2>
+    <p><code>String</code> — изменяемая строка в куче; <code>&amp;str</code> — неизменяемый срез
+    (литералы — именно <code>&amp;str</code>). Строки — это UTF-8, поэтому индексация
+    по символу <code>s[0]</code> запрещена:</p>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> <span class="kw">mut</span> s = <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"При"</span>);
+        s.<span class="fn">push_str</span>(<span class="str">"вет"</span>);            <span class="com">// добавить срез</span>
+        s.<span class="fn">push</span>(<span class="str">'!'</span>);                  <span class="com">// добавить char</span>
+    
+        <span class="kw">let</span> s1 = <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"1, "</span>);
+        <span class="kw">let</span> s2 = <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"2, 3"</span>);
+        <span class="kw">let</span> s3 = s1 + &amp;s2;            <span class="com">// + забирает владение s1</span>
+        <span class="kw">let</span> joined = <span class="mac">format!</span>(<span class="str">"{} + {}"</span>, s3, <span class="str">"итог"</span>); <span class="com">// format! не забирает владение</span>
+    
+        <span class="mac">println!</span>(<span class="str">"{}"</span>, joined);
+    
+        <span class="kw">for</span> c <span class="kw">in</span> <span class="str">"Здр🦀"</span>.<span class="fn">chars</span>() {    <span class="com">// итерация по символам</span>
+            <span class="mac">print!</span>(<span class="str">"[{}] "</span>, c);
+        }
+        <span class="mac">println!</span>();
+    }</code></pre>
+    
+    <h2>HashMap&lt;K, V&gt; — хеш-таблица</h2>
+    <pre><code class="lang-rust"><span class="kw">use</span> std::collections::<span class="ty">HashMap</span>;
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> <span class="kw">mut</span> scores: <span class="ty">HashMap</span>&lt;<span class="ty">String</span>, <span class="ty">i32</span>&gt; = <span class="ty">HashMap</span>::<span class="fn">new</span>();
+        scores.<span class="fn">insert</span>(<span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"Blue"</span>), <span class="num">10</span>);
+        scores.<span class="fn">insert</span>(<span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"Yellow"</span>), <span class="num">50</span>);
+    
+        <span class="kw">let</span> team = <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"Blue"</span>);
+        <span class="kw">let</span> score = scores.<span class="fn">get</span>(&amp;team).<span class="fn">copied</span>().<span class="fn">unwrap_or</span>(<span class="num">0</span>); <span class="com">// get -&gt; Option&lt;&amp;V&gt;</span>
+        <span class="mac">println!</span>(<span class="str">"{}"</span>, score);
+    
+        <span class="com">// entry: вставить, только если ключа ещё нет</span>
+        scores.<span class="fn">entry</span>(<span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"Red"</span>)).<span class="fn">or_insert</span>(<span class="num">0</span>);
+    
+        <span class="kw">for</span> (key, value) <span class="kw">in</span> &amp;scores {
+            <span class="mac">println!</span>(<span class="str">"{key}: {value}"</span>);
+        }
+    }</code></pre>
+    <p>Классическая задача — подсчёт слов:</p>
+    <pre><code class="lang-rust"><span class="kw">use</span> std::collections::<span class="ty">HashMap</span>;
+    
+    <span class="kw">fn</span> <span class="fn">word_count</span>(text: &amp;<span class="ty">str</span>) -&gt; <span class="ty">HashMap</span>&lt;<span class="ty">String</span>, <span class="ty">u32</span>&gt; {
+        <span class="kw">let</span> <span class="kw">mut</span> map = <span class="ty">HashMap</span>::<span class="fn">new</span>();
+        <span class="kw">for</span> word <span class="kw">in</span> text.<span class="fn">split_whitespace</span>() {
+            <span class="kw">let</span> count = map.<span class="fn">entry</span>(word.<span class="fn">to_string</span>()).<span class="fn">or_insert</span>(<span class="num">0</span>);
+            *count += <span class="num">1</span>;
+        }
+        map
+    }
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> text = <span class="str">"the quick brown fox jumps over the lazy dog the end"</span>;
+        <span class="mac">println!</span>(<span class="str">"{:?}"</span>, <span class="fn">word_count</span>(text));
+    }</code></pre>
+    
+    <h2>Коллекции и владение</h2>
+    <ul>
+      <li>Коллекция <b>владеет</b> своими элементами: при удалении вектора удаляются и значения.</li>
+      <li><code>insert</code> перемещает ключ и значение в таблицу (для <code>String</code>).</li>
+      <li>Итерация по <code>&amp;v</code> заимствует элементы, по <code>v</code> — забирает владение.</li>
+    </ul>
+    
+    <h2>Ключевые моменты</h2>
+    <ul>
+      <li><code>vec![]</code>, <code>String::from</code>, <code>HashMap::new</code> — стандартные способы создания.</li>
+      <li>Безопасный доступ к элементам — <code>get()</code>, возвращающий <code>Option</code>.</li>
+      <li><code>entry(...).or_insert(...)</code> — идиоматичная работа с HashMap.</li>
+    </ul>
+    <div class="pager"><a class="prev" href="enums-match.html"><span>← Назад</span><b>Перечисления и match</b></a><a class="next" href="generics-traits.html"><span>Далее →</span><b>Дженерики и трейты</b></a></div>
+  </main>
+</div>
+<footer class="site-footer">
+  <p>Учебный проект RolliBow, все права защищены</p>
+</footer>
+</body>
+</html>

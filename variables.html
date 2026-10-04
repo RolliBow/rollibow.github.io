@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="let, mut, константы и затенение (shadowing) переменных в Rust.">
+<title>Переменные и изменяемость — Rust: документация</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="index.html">🦀 Rust</a>
+    <span class="logo-sub">Документация языка</span>
+    <span class="badge">1.90 · stable</span>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" aria-label="Разделы документации">
+  <div class="nav-group">
+    <p class="nav-title">Начало работы</p>
+    <a href="index.html">Обзор</a>
+    <a href="installation.html">Установка</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Основы</p>
+    <a class="active" href="variables.html">Переменные</a>
+    <a href="types.html">Типы данных</a>
+    <a href="functions.html">Функции</a>
+    <a href="control-flow.html">Условия и циклы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Система владения</p>
+    <a href="ownership.html">Владение</a>
+    <a href="borrowing.html">Ссылки и срезы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Типы данных</p>
+    <a href="structs.html">Структуры</a>
+    <a href="enums-match.html">Перечисления и match</a>
+    <a href="collections.html">Коллекции</a>
+    <a href="generics-traits.html">Дженерики и трейты</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Практика</p>
+    <a href="errors.html">Обработка ошибок</a>
+    <a href="modules.html">Модули и cargo</a>
+    <a href="cheat-sheet.html">Шпаргалка</a>
+  </div>
+  </nav>
+  <main>
+    <h1>Переменные и изменяемость</h1>
+    <p>По умолчанию переменные в Rust <b>неизменяемы (immutable)</b>: после привязки значения
+    к имени его нельзя заменить. Изменяемость включается явно ключевым словом <code>mut</code>.</p>
+    
+    <h2>let и mut</h2>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> x = <span class="num">5</span>;
+        <span class="mac">println!</span>(<span class="str">"x = {}"</span>, x);
+    
+        <span class="com">// x = 6; // ОШИБКА: нельзя присвоить значение неизменяемой переменной</span>
+    
+        <span class="kw">let</span> <span class="kw">mut</span> y = <span class="num">10</span>;
+        y = <span class="num">20</span>;    <span class="com">// ОК: y объявлена как mut</span>
+        <span class="mac">println!</span>(<span class="str">"y = {}"</span>, y);
+    }</code></pre>
+    <p>Неизменяемость по умолчанию — часть гарантий безопасности: компилятор
+    подтверждает, что значение никогда не изменится.</p>
+    
+    <h2>Константы</h2>
+    <p>Константы объявляются через <code>const</code>: тип <b>обязателен</b>, значение известно
+    на этапе компиляции, область видимости — любая, включая глобальную.</p>
+    <pre><code class="lang-rust"><span class="kw">const</span> <span class="ty">MAX_POINTS</span>: <span class="ty">u32</span> = <span class="num">100_000</span>;
+    <span class="kw">const</span> <span class="ty">SECONDS_IN_HOUR</span>: <span class="ty">u64</span> = <span class="num">60</span> * <span class="num">60</span>; <span class="com">// можно вычислять константные выражения</span>
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="mac">println!</span>(<span class="str">"Лимит: {} очков"</span>, <span class="ty">MAX_POINTS</span>);
+    }</code></pre>
+    
+    <h2>Затенение (shadowing)</h2>
+    <p>Повторный <code>let</code> с тем же именем <b>затеняет</b> предыдущую переменную:
+    создаётся новая привязка, которая может даже иметь другой тип.</p>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> spaces = <span class="str">"   "</span>;        <span class="com">// тип &amp;str</span>
+        <span class="kw">let</span> spaces = spaces.<span class="fn">len</span>(); <span class="com">// затенение: теперь это usize</span>
+    
+        <span class="kw">let</span> x = <span class="num">5</span>;
+        <span class="kw">let</span> x = x + <span class="num">1</span>;
+        <span class="kw">let</span> x = x * <span class="num">2</span>;
+        <span class="mac">println!</span>(<span class="str">"x = {}, spaces = {}"</span>, x, spaces); <span class="com">// x = 12, spaces = 3</span>
+    }</code></pre>
+    <table>
+      <tr><th></th><th><code>let mut</code></th><th>Затенение (<code>let</code>)</th></tr>
+      <tr><td>Создаёт новую переменную</td><td>нет</td><td>да</td></tr>
+      <tr><td>Можно сменить тип</td><td>нет</td><td>да</td></tr>
+      <tr><td>Может остаться неизменяемой</td><td>нет</td><td>да</td></tr>
+    </table>
+    
+    <h2>Ключевые моменты</h2>
+    <ul>
+      <li>Переменные неизменяемы, если не указано <code>mut</code>.</li>
+      <li><code>const</code> требует явного типа и существует на этапе компиляции.</li>
+      <li>Затенение создаёт новую переменную — тип можно менять.</li>
+    </ul>
+    <div class="pager"><a class="prev" href="installation.html"><span>← Назад</span><b>Установка</b></a><a class="next" href="types.html"><span>Далее →</span><b>Типы данных</b></a></div>
+  </main>
+</div>
+<footer class="site-footer">
+  <p>Учебный проект RolliBow, все права защищены</p>
+</footer>
+</body>
+</html>

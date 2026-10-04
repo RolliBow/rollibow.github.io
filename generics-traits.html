@@ -1,0 +1,175 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Обобщённые типы <T>, трейты, реализации и ограничения (trait bounds).">
+<title>Дженерики и трейты — Rust: документация</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="index.html">🦀 Rust</a>
+    <span class="logo-sub">Документация языка</span>
+    <span class="badge">1.90 · stable</span>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" aria-label="Разделы документации">
+  <div class="nav-group">
+    <p class="nav-title">Начало работы</p>
+    <a href="index.html">Обзор</a>
+    <a href="installation.html">Установка</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Основы</p>
+    <a href="variables.html">Переменные</a>
+    <a href="types.html">Типы данных</a>
+    <a href="functions.html">Функции</a>
+    <a href="control-flow.html">Условия и циклы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Система владения</p>
+    <a href="ownership.html">Владение</a>
+    <a href="borrowing.html">Ссылки и срезы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Типы данных</p>
+    <a href="structs.html">Структуры</a>
+    <a href="enums-match.html">Перечисления и match</a>
+    <a href="collections.html">Коллекции</a>
+    <a class="active" href="generics-traits.html">Дженерики и трейты</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Практика</p>
+    <a href="errors.html">Обработка ошибок</a>
+    <a href="modules.html">Модули и cargo</a>
+    <a href="cheat-sheet.html">Шпаргалка</a>
+  </div>
+  </nav>
+  <main>
+    <h1>Дженерики и трейты</h1>
+    <p><b>Дженерики</b> убирают дублирование: один алгоритм работает с разными типами.
+    <b>Трейты</b> описывают поведение, которое типы могут реализовывать (аналог интерфейсов).</p>
+    
+    <h2>Обобщённые функции</h2>
+    <pre><code class="lang-rust"><span class="kw">fn</span> largest&lt;<span class="ty">T</span>: <span class="ty">PartialOrd</span>&gt;(list: &amp;[<span class="ty">T</span>]) -&gt; &amp;<span class="ty">T</span> {
+        <span class="kw">let</span> <span class="kw">mut</span> largest = &amp;list[<span class="num">0</span>];
+        <span class="kw">for</span> item <span class="kw">in</span> &amp;list[<span class="num">1</span>..] {
+            <span class="kw">if</span> item &gt; largest {
+                largest = item;
+            }
+        }
+        largest
+    }
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> numbers = <span class="mac">vec!</span>[<span class="num">34</span>, <span class="num">50</span>, <span class="num">25</span>, <span class="num">100</span>, <span class="num">65</span>];
+        <span class="mac">println!</span>(<span class="str">"Максимум: {}"</span>, <span class="fn">largest</span>(&amp;numbers)); <span class="com">// 100</span>
+    
+        <span class="kw">let</span> letters = <span class="mac">vec!</span>[<span class="str">'y'</span>, <span class="str">'m'</span>, <span class="str">'a'</span>, <span class="str">'q'</span>];
+        <span class="mac">println!</span>(<span class="str">"Максимум: {}"</span>, <span class="fn">largest</span>(&amp;letters)); <span class="com">// 'y'</span>
+    }</code></pre>
+    <p>Запись <code>T: PartialOrd</code> — <b>ограничение трейта</b>: функция принимает только те
+    <code>T</code>, которые умеют сравниваться.</p>
+    
+    <h2>Обобщённые структуры</h2>
+    <pre><code class="lang-rust"><span class="attr">#[derive(Debug)]</span>
+    <span class="kw">struct</span> <span class="ty">Point</span>&lt;<span class="ty">T</span>&gt; {
+        x: <span class="ty">T</span>,
+        y: <span class="ty">T</span>,
+    }
+    
+    <span class="kw">impl</span>&lt;<span class="ty">T</span>&gt; <span class="ty">Point</span>&lt;<span class="ty">T</span>&gt; {
+        <span class="kw">fn</span> <span class="fn">x</span>(&amp;<span class="kw">self</span>) -&gt; &amp;<span class="ty">T</span> {
+            &amp;<span class="kw">self</span>.x
+        }
+    }
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> integer = <span class="ty">Point</span> { x: <span class="num">5</span>, y: <span class="num">10</span> };
+        <span class="kw">let</span> float = <span class="ty">Point</span> { x: <span class="num">1.0</span>, y: <span class="num">4.0</span> };
+        <span class="mac">println!</span>(<span class="str">"{:?} — {}"</span>, integer, integer.<span class="fn">x</span>());
+    }</code></pre>
+    
+    <h2>Трейты</h2>
+    <p>Трейт объявляет сигнатуры методов; часть методов может иметь реализацию
+    по умолчанию:</p>
+    <pre><code class="lang-rust"><span class="kw">pub</span> <span class="kw">trait</span> <span class="ty">Summary</span> {
+        <span class="kw">fn</span> <span class="fn">summarize</span>(&amp;<span class="kw">self</span>) -&gt; <span class="ty">String</span>;          <span class="com">// обязателен</span>
+    
+        <span class="kw">fn</span> <span class="fn">preview</span>(&amp;<span class="kw">self</span>) -&gt; <span class="ty">String</span> {           <span class="com">// реализация по умолчанию</span>
+            <span class="mac">format!</span>(<span class="str">"Читать далее: {}..."</span>, <span class="kw">self</span>.<span class="fn">summarize</span>())
+        }
+    }
+    
+    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ty">Article</span> {
+        <span class="kw">pub</span> headline: <span class="ty">String</span>,
+        <span class="kw">pub</span> author: <span class="ty">String</span>,
+    }
+    
+    <span class="kw">impl</span> <span class="ty">Summary</span> <span class="kw">for</span> <span class="ty">Article</span> {
+        <span class="kw">fn</span> <span class="fn">summarize</span>(&amp;<span class="kw">self</span>) -&gt; <span class="ty">String</span> {
+            <span class="mac">format!</span>(<span class="str">"{}, автор {}"</span>, <span class="kw">self</span>.headline, <span class="kw">self</span>.author)
+        }
+    }
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> a = <span class="ty">Article</span> {
+            headline: <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"Rust 1.90"</span>),
+            author: <span class="ty">String</span>::<span class="fn">from</span>(<span class="str">"Red"</span>),
+        };
+        <span class="mac">println!</span>(<span class="str">"{}"</span>, a.<span class="fn">preview</span>()); <span class="com">// использует метод по умолчанию</span>
+    }</code></pre>
+    
+    <h2>Трейты как параметры</h2>
+    <pre><code class="lang-rust"><span class="com">// Синтаксический сахар impl Trait</span>
+    <span class="kw">fn</span> <span class="fn">notify</span>(item: &amp;<span class="kw">impl</span> <span class="ty">Summary</span>) {
+        <span class="mac">println!</span>(<span class="str">"Срочные новости! {}"</span>, item.<span class="fn">summarize</span>());
+    }
+    
+    <span class="com">// То же через дженерик с ограничением</span>
+    <span class="kw">fn</span> notify2&lt;<span class="ty">T</span>: <span class="ty">Summary</span>&gt;(item: &amp;<span class="ty">T</span>) {
+        <span class="mac">println!</span>(<span class="str">"Срочные новости! {}"</span>, item.<span class="fn">summarize</span>());
+    }
+    
+    <span class="com">// Несколько трейтов: + ; полная форма — where</span>
+    <span class="kw">fn</span> print_it&lt;<span class="ty">T</span>&gt;(item: &amp;<span class="ty">T</span>)
+    <span class="kw">where</span>
+        <span class="ty">T</span>: <span class="ty">Summary</span> + std::fmt::<span class="ty">Display</span>,
+    {
+        <span class="mac">println!</span>(<span class="str">"{}"</span>, item.<span class="fn">summarize</span>());
+    }</code></pre>
+    
+    <h2>Частые трейты стандартной библиотеки</h2>
+    <table>
+      <tr><th>Трейт</th><th>Что даёт</th></tr>
+      <tr><td><code>Debug</code></td><td>Отладочная печать <code>{:?}</code></td></tr>
+      <tr><td><code>Clone</code></td><td>Явное глубокое копирование <code>.clone()</code></td></tr>
+      <tr><td><code>Copy</code></td><td>Неявное копирование присваиванием (маркерный трейт)</td></tr>
+      <tr><td><code>PartialEq / Eq</code></td><td>Сравнение <code>==</code></td></tr>
+      <tr><td><code>PartialOrd / Ord</code></td><td>Сортировка, <code>&lt;</code>, <code>&gt;</code></td></tr>
+      <tr><td><code>Default</code></td><td>Значение по умолчанию <code>Default::default()</code></td></tr>
+      <tr><td><code>Iterator</code></td><td>Ленивые цепочки <code>.map().filter().collect()</code></td></tr>
+    </table>
+    
+    <h2>Ключевые моменты</h2>
+    <ul>
+      <li>Дженерики — мономорфизация: компилятор генерирует код под каждый конкретный тип, нулевая цена в рантайме.</li>
+      <li>Трейт = контракт поведения; <code>impl Trait for Type</code> — реализация.</li>
+      <li>Ограничения (<code>T: Trait</code>) говорят компилятору, что умеет обобщённый тип.</li>
+    </ul>
+    <div class="pager"><a class="prev" href="collections.html"><span>← Назад</span><b>Коллекции</b></a><a class="next" href="errors.html"><span>Далее →</span><b>Обработка ошибок</b></a></div>
+  </main>
+</div>
+<footer class="site-footer">
+  <p>Учебный проект RolliBow, все права защищены</p>
+</footer>
+</body>
+</html>

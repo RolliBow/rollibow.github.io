@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Установка Rust через rustup, знакомство с cargo, создание и запуск первого проекта.">
+<title>Установка и первая программа — Rust: документация</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="index.html">🦀 Rust</a>
+    <span class="logo-sub">Документация языка</span>
+    <span class="badge">1.90 · stable</span>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" aria-label="Разделы документации">
+  <div class="nav-group">
+    <p class="nav-title">Начало работы</p>
+    <a href="index.html">Обзор</a>
+    <a class="active" href="installation.html">Установка</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Основы</p>
+    <a href="variables.html">Переменные</a>
+    <a href="types.html">Типы данных</a>
+    <a href="functions.html">Функции</a>
+    <a href="control-flow.html">Условия и циклы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Система владения</p>
+    <a href="ownership.html">Владение</a>
+    <a href="borrowing.html">Ссылки и срезы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Типы данных</p>
+    <a href="structs.html">Структуры</a>
+    <a href="enums-match.html">Перечисления и match</a>
+    <a href="collections.html">Коллекции</a>
+    <a href="generics-traits.html">Дженерики и трейты</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Практика</p>
+    <a href="errors.html">Обработка ошибок</a>
+    <a href="modules.html">Модули и cargo</a>
+    <a href="cheat-sheet.html">Шпаргалка</a>
+  </div>
+  </nav>
+  <main>
+    <h1>Установка и первая программа</h1>
+    <p>Тулчейн Rust устанавливается через <b>rustup</b> — официальный менеджер версий.
+    Он ставит компилятор <code>rustc</code>, пакетный менеджер <code>cargo</code> и документацию.</p>
+    
+    <h2>Установка rustup</h2>
+    <pre><code class="lang-bash"><span class="com"># Linux / macOS</span>
+    <span class="attr">$ </span>curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    
+    <span class="com"># Windows — скачать и запустить rustup-init.exe с сайта rustup.rs</span>
+    
+    <span class="com"># После установки проверить версии</span>
+    <span class="attr">$ </span>rustc --version
+    <span class="attr">$ </span>cargo --version</code></pre>
+    <p>Полезные команды rustup: <code>rustup update</code> — обновить тулчейн,
+    <code>rustup doc</code> — открыть локальную документацию.</p>
+    
+    <h2>Первый проект на cargo</h2>
+    <p><b>Cargo</b> создаёт проект, скачивает зависимости, компилирует и запускает код:</p>
+    <pre><code class="lang-bash"><span class="attr">$ </span>cargo new hello_rust     <span class="com"># создать бинарный проект</span>
+    <span class="attr">$ </span>cd hello_rust
+    <span class="attr">$ </span>cargo build              <span class="com"># скомпилировать</span>
+    <span class="attr">$ </span>cargo run                <span class="com"># скомпилировать и запустить</span></code></pre>
+    <p>Структура проекта:</p>
+    <pre><code class="lang-text">hello_rust/
+    ├── Cargo.toml      # манифест: имя, версия, зависимости
+    └── src/
+        └── main.rs     # точка входа</code></pre>
+    
+    <h2>Код программы</h2>
+    <p>Содержимое <code>src/main.rs</code> по умолчанию:</p>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="mac">println!</span>(<span class="str">"Hello, world!"</span>);
+    }</code></pre>
+    <ul>
+      <li><code>fn main()</code> — точка входа: функция без аргументов и возвращаемого значения.</li>
+      <li><code>println!</code> — <b>макрос</b> (отсюда <code>!</code>): в отличие от функции, он раскрывается на этапе компиляции и принимает переменное число аргументов.</li>
+      <li>Каждое выражение завершается точкой с запятой <code>;</code>.</li>
+    </ul>
+    
+    <h2>Ключевые моменты</h2>
+    <ul>
+      <li>rustup управляет версиями тулчейна, cargo — проектами и зависимостями.</li>
+      <li><code>cargo run</code> = <code>cargo build</code> + запуск бинарника.</li>
+      <li>Макросы вызываются с <code>!</code>: <code>println!</code>, <code>vec!</code>, <code>format!</code>.</li>
+    </ul>
+    <div class="pager"><a class="prev" href="index.html"><span>← Назад</span><b>Обзор</b></a><a class="next" href="variables.html"><span>Далее →</span><b>Переменные</b></a></div>
+  </main>
+</div>
+<footer class="site-footer">
+  <p>Учебный проект RolliBow, все права защищены</p>
+</footer>
+</body>
+</html>

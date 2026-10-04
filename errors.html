@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="panic!, Result<T, E>, оператор ? и выбор стратегии обработки ошибок.">
+<title>Обработка ошибок — Rust: документация</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="index.html">🦀 Rust</a>
+    <span class="logo-sub">Документация языка</span>
+    <span class="badge">1.90 · stable</span>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" aria-label="Разделы документации">
+  <div class="nav-group">
+    <p class="nav-title">Начало работы</p>
+    <a href="index.html">Обзор</a>
+    <a href="installation.html">Установка</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Основы</p>
+    <a href="variables.html">Переменные</a>
+    <a href="types.html">Типы данных</a>
+    <a href="functions.html">Функции</a>
+    <a href="control-flow.html">Условия и циклы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Система владения</p>
+    <a href="ownership.html">Владение</a>
+    <a href="borrowing.html">Ссылки и срезы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Типы данных</p>
+    <a href="structs.html">Структуры</a>
+    <a href="enums-match.html">Перечисления и match</a>
+    <a href="collections.html">Коллекции</a>
+    <a href="generics-traits.html">Дженерики и трейты</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Практика</p>
+    <a class="active" href="errors.html">Обработка ошибок</a>
+    <a href="modules.html">Модули и cargo</a>
+    <a href="cheat-sheet.html">Шпаргалка</a>
+  </div>
+  </nav>
+  <main>
+    <h1>Обработка ошибок</h1>
+    <p>Rust делит ошибки на две группы: <b>неисправимые</b> (<code>panic!</code> — аварийная
+    остановка) и <b>исправимые</b> (<code>Result&lt;T, E&gt;</code> — значение, которое можно вернуть
+    и обработать).</p>
+    
+    <h2>panic! — неисправимые ошибки</h2>
+    <p>Паника печатает сообщение, раскручивает стек и завершает поток. Используется
+    для состояний «так не должно быть никогда»:</p>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> v = <span class="mac">vec!</span>[<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>];
+        <span class="mac">println!</span>(<span class="str">"{}"</span>, v[<span class="num">99</span>]); <span class="com">// panic: index out of bounds</span>
+    
+        <span class="com">// panic!("остановись и расскажи, что произошло");</span>
+    }</code></pre>
+    <pre><code class="lang-bash"><span class="com"># Полезный бэктрейс места паники</span>
+    <span class="attr">$ </span>RUST_BACKTRACE=1 cargo run</code></pre>
+    
+    <h2>Result&lt;T, E&gt; — исправимые ошибки</h2>
+    <pre><code class="lang-rust"><span class="kw">use</span> std::fs::<span class="ty">File</span>;
+    <span class="kw">use</span> std::io::<span class="ty">ErrorKind</span>;
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> f = <span class="ty">File</span>::<span class="fn">open</span>(<span class="str">"hello.txt"</span>);
+    
+        <span class="kw">let</span> file = <span class="kw">match</span> f {
+            <span class="ty">Ok</span>(file) =&gt; file,
+            <span class="ty">Err</span>(error) =&gt; <span class="kw">match</span> error.<span class="fn">kind</span>() {
+                <span class="ty">ErrorKind</span>::<span class="ty">NotFound</span> =&gt; <span class="kw">match</span> <span class="ty">File</span>::<span class="fn">create</span>(<span class="str">"hello.txt"</span>) {
+                    <span class="ty">Ok</span>(fc) =&gt; fc,
+                    <span class="ty">Err</span>(e) =&gt; <span class="mac">panic!</span>(<span class="str">"не удалось создать файл: {:?}"</span>, e),
+                },
+                other =&gt; <span class="mac">panic!</span>(<span class="str">"не удалось открыть файл: {:?}"</span>, other),
+            },
+        };
+        <span class="fn">drop</span>(file);
+    }</code></pre>
+    <p>Короче — через замыкания и комбинаторы:</p>
+    <pre><code class="lang-rust"><span class="kw">use</span> std::fs::<span class="ty">File</span>;
+    <span class="kw">use</span> std::io::<span class="ty">ErrorKind</span>;
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> f = <span class="ty">File</span>::<span class="fn">open</span>(<span class="str">"hello.txt"</span>).<span class="fn">unwrap_or_else</span>(|error| {
+            <span class="kw">if</span> error.<span class="fn">kind</span>() == <span class="ty">ErrorKind</span>::<span class="ty">NotFound</span> {
+                <span class="ty">File</span>::<span class="fn">create</span>(<span class="str">"hello.txt"</span>).<span class="fn">expect</span>(<span class="str">"не удалось создать файл"</span>)
+            } <span class="kw">else</span> {
+                <span class="mac">panic!</span>(<span class="str">"не удалось открыть файл: {:?}"</span>, error);
+            }
+        });
+        <span class="fn">drop</span>(f);
+    }</code></pre>
+    <table>
+      <tr><th>Метод</th><th>Поведение при Err</th></tr>
+      <tr><td><code>.unwrap()</code></td><td>Паника с стандартным сообщением</td></tr>
+      <tr><td><code>.expect("msg")</code></td><td>Паника с вашим сообщением</td></tr>
+      <tr><td><code>.unwrap_or(x)</code></td><td>Вернёт запасное значение x</td></tr>
+      <tr><td><code>.unwrap_or_else(f)</code></td><td>Вычислит запасное значение в замыкании</td></tr>
+    </table>
+    
+    <h2>Оператор ? — распространение ошибок</h2>
+    <p><code>?</code> после выражения с <code>Result</code>: при <code>Ok</code> достаёт значение, при <code>Err</code> —
+    <b>ранний возврат</b> ошибки вызывающему коду:</p>
+    <pre><code class="lang-rust"><span class="kw">use</span> std::fs;
+    <span class="kw">use</span> std::io;
+    
+    <span class="kw">fn</span> <span class="fn">read_username</span>() -&gt; io::<span class="ty">Result</span>&lt;<span class="ty">String</span>&gt; {
+        <span class="com">// Эквивалент длинного match: одна строка вместо десяти</span>
+        <span class="kw">let</span> content = fs::<span class="fn">read_to_string</span>(<span class="str">"username.txt"</span>)?;
+        <span class="ty">Ok</span>(content.<span class="fn">trim</span>().<span class="fn">to_string</span>())
+    }
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">match</span> <span class="fn">read_username</span>() {
+            <span class="ty">Ok</span>(name) =&gt; <span class="mac">println!</span>(<span class="str">"Привет, {}!"</span>, name),
+            <span class="ty">Err</span>(e) =&gt; <span class="mac">eprintln!</span>(<span class="str">"Ошибка: {}"</span>, e),
+        }
+    }</code></pre>
+    
+    <h2>Когда что использовать</h2>
+    <ul>
+      <li><b>panic!</b> — нарушение инвариантов, невозможное состояние, тесты, <code>unreachable!</code>.</li>
+      <li><b>Result</b> — ожидаемые сбои: файлы, сеть, парсинг, ввод пользователя.</li>
+      <li><b>?</b> — в функциях, которые сами возвращают <code>Result</code> (или <code>Option</code>, или <code>main</code> с типом ошибки).</li>
+    </ul>
+    
+    <h2>Ключевые моменты</h2>
+    <ul>
+      <li>Ошибки — обычные значения: <code>enum Result&lt;T, E&gt; { Ok(T), Err(E) }</code>.</li>
+      <li><code>?</code> заменяет «пирамиды» из match при пробросе ошибок вверх.</li>
+      <li>Прототипы: <code>unwrap/expect</code>; продакшен: <code>Result</code> + осмысленные сообщения.</li>
+    </ul>
+    <div class="pager"><a class="prev" href="generics-traits.html"><span>← Назад</span><b>Дженерики и трейты</b></a><a class="next" href="modules.html"><span>Далее →</span><b>Модули и cargo</b></a></div>
+  </main>
+</div>
+<footer class="site-footer">
+  <p>Учебный проект RolliBow, все права защищены</p>
+</footer>
+</body>
+</html>

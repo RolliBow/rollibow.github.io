@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Объявление функций, параметры, возвращаемые значения, выражения и инструкции.">
+<title>Функции — Rust: документация</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="index.html">🦀 Rust</a>
+    <span class="logo-sub">Документация языка</span>
+    <span class="badge">1.90 · stable</span>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" aria-label="Разделы документации">
+  <div class="nav-group">
+    <p class="nav-title">Начало работы</p>
+    <a href="index.html">Обзор</a>
+    <a href="installation.html">Установка</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Основы</p>
+    <a href="variables.html">Переменные</a>
+    <a href="types.html">Типы данных</a>
+    <a class="active" href="functions.html">Функции</a>
+    <a href="control-flow.html">Условия и циклы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Система владения</p>
+    <a href="ownership.html">Владение</a>
+    <a href="borrowing.html">Ссылки и срезы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Типы данных</p>
+    <a href="structs.html">Структуры</a>
+    <a href="enums-match.html">Перечисления и match</a>
+    <a href="collections.html">Коллекции</a>
+    <a href="generics-traits.html">Дженерики и трейты</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Практика</p>
+    <a href="errors.html">Обработка ошибок</a>
+    <a href="modules.html">Модули и cargo</a>
+    <a href="cheat-sheet.html">Шпаргалка</a>
+  </div>
+  </nav>
+  <main>
+    <h1>Функции</h1>
+    <p>Функции объявляются ключевым словом <code>fn</code>. Соглашение об именовании —
+    <code>snake_case</code>. Функции можно вызывать до объявления — порядок в файле не важен.</p>
+    
+    <h2>Параметры</h2>
+    <p>Тип каждого параметра указывается <b>обязательно</b> — это часть сигнатуры:</p>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">greet</span>(name: &amp;<span class="ty">str</span>, times: <span class="ty">u32</span>) {
+        <span class="kw">for</span> _ <span class="kw">in</span> <span class="num">0</span>..times {
+            <span class="mac">println!</span>(<span class="str">"Привет, {}!"</span>, name);
+        }
+    }
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="fn">greet</span>(<span class="str">"мир"</span>, <span class="num">3</span>);
+    }</code></pre>
+    
+    <h2>Инструкции и выражения</h2>
+    <p>Важное различие Rust:</p>
+    <ul>
+      <li><b>Инструкции</b> выполняют действие и не возвращают значение: <code>let x = 5;</code></li>
+      <li><b>Выражения</b> вычисляют значение: <code>5 + 6</code>, вызов функции, <b>блок кода</b>.</li>
+    </ul>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> y = {          <span class="com">// блок — это выражение!</span>
+            <span class="kw">let</span> x = <span class="num">3</span>;
+            x + <span class="num">1</span>          <span class="com">// без точки с запятой — значение блока</span>
+        };
+        <span class="mac">println!</span>(<span class="str">"y = {}"</span>, y); <span class="com">// 4</span>
+    }</code></pre>
+    <div class="note">
+      <p>Точка с запятой превращает выражение в инструкцию. Случайно поставленная
+      <code>;</code> после возвращаемого значения — классическая ошибка новичка.</p>
+    </div>
+    
+    <h2>Возвращаемые значения</h2>
+    <p>Тип возврата указывается после стрелки <code>-&gt;</code>. Значение возвращается либо
+    оператором <code>return</code>, либо <b>последним выражением</b> тела функции (без <code>;</code>):</p>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">plus_one</span>(x: <span class="ty">i32</span>) -&gt; <span class="ty">i32</span> {
+        x + <span class="num">1</span>               <span class="com">// неявный возврат последнего выражения</span>
+    }
+    
+    <span class="kw">fn</span> <span class="fn">abs</span>(x: <span class="ty">i32</span>) -&gt; <span class="ty">i32</span> {
+        <span class="kw">if</span> x &lt; <span class="num">0</span> {
+            <span class="kw">return</span> -x;      <span class="com">// явный ранний возврат</span>
+        }
+        x
+    }
+    
+    <span class="kw">fn</span> <span class="fn">pair</span>() -&gt; (<span class="ty">i32</span>, <span class="ty">i32</span>) {
+        (<span class="num">1</span>, <span class="num">2</span>)              <span class="com">// можно возвращать кортежи</span>
+    }
+    
+    <span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="mac">println!</span>(<span class="str">"{} {} {:?}"</span>, <span class="fn">plus_one</span>(<span class="num">5</span>), <span class="fn">abs</span>(-<span class="num">7</span>), <span class="fn">pair</span>());
+    }</code></pre>
+    
+    <h2>Ключевые моменты</h2>
+    <ul>
+      <li>Типы параметров и返回值 обязательны в сигнатуре.</li>
+      <li>Блок <code>{ ... }</code> — выражение, его значение — последнее выражение без <code>;</code>.</li>
+      <li><code>return</code> нужен только для раннего выхода, иначе возвращается последнее выражение.</li>
+    </ul>
+    <div class="pager"><a class="prev" href="types.html"><span>← Назад</span><b>Типы данных</b></a><a class="next" href="control-flow.html"><span>Далее →</span><b>Условия и циклы</b></a></div>
+  </main>
+</div>
+<footer class="site-footer">
+  <p>Учебный проект RolliBow, все права защищены</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Краткий справочник по языку Rust: установка, синтаксис, владение, трейты и обработка ошибок.">
+<title>Rust — документация языка — Rust: документация</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="index.html">🦀 Rust</a>
+    <span class="logo-sub">Документация языка</span>
+    <span class="badge">1.90 · stable</span>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" aria-label="Разделы документации">
+  <div class="nav-group">
+    <p class="nav-title">Начало работы</p>
+    <a class="active" href="index.html">Обзор</a>
+    <a href="installation.html">Установка</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Основы</p>
+    <a href="variables.html">Переменные</a>
+    <a href="types.html">Типы данных</a>
+    <a href="functions.html">Функции</a>
+    <a href="control-flow.html">Условия и циклы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Система владения</p>
+    <a href="ownership.html">Владение</a>
+    <a href="borrowing.html">Ссылки и срезы</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Типы данных</p>
+    <a href="structs.html">Структуры</a>
+    <a href="enums-match.html">Перечисления и match</a>
+    <a href="collections.html">Коллекции</a>
+    <a href="generics-traits.html">Дженерики и трейты</a>
+  </div>
+  <div class="nav-group">
+    <p class="nav-title">Практика</p>
+    <a href="errors.html">Обработка ошибок</a>
+    <a href="modules.html">Модули и cargo</a>
+    <a href="cheat-sheet.html">Шпаргалка</a>
+  </div>
+  </nav>
+  <main>
+    <h1>Rust — документация языка</h1>
+    <p class="lead">Краткий справочник по языку <b>Rust</b> - системному языку программирования.</p>
+    
+    <figure>
+      <img src="image.jpg" alt="Талисман Rust переносит значение из стека в кучу">
+      <figcaption>Рис. 1. Талисман переносит значение: память живёт, пока жив её владелец</figcaption>
+    </figure>
+
+    <h2>Почему стоит выбрать Rust</h2>
+    <ul>
+      <li><b>Производительность.</b> Компилируемый язык без рантайма и сборщика мусора — уровень C/C++.</li>
+      <li><b>Безопасность памяти.</b> Система владения (ownership) отлавливает гонки данных и висячие указатели на этапе компиляции.</li>
+      <li><b>Бесстрашный параллелизм.</b> Компилятор не даст разделить изменяемые данные между потоками.</li>
+      <li><b>Cargo.</b> Встроенный пакетный менеджер и система сборки «из коробки».</li>
+    </ul>
+    
+    <h2>Первая программа</h2>
+    <p>Классический пример — файл <code>main.rs</code>, сборка и запуск одной командой <code>cargo run</code>:</p>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="mac">println!</span>(<span class="str">"Привет, мир!"</span>);
+    
+        <span class="kw">let</span> lang = <span class="str">"Rust"</span>;
+        <span class="kw">let</span> year = <span class="num">2026</span>;
+        <span class="mac">println!</span>(<span class="str">"{} в {} году — отличный выбор!"</span>, lang, year);
+    }</code></pre>
+    
+    <h2>Как читать этот справочник</h2>
+    <table>
+      <tr><th>Блок</th><th>Что делает</th></tr>
+      <tr><td>Разделы «Начало работы»</td><td>Установка тулчейна и базовый синтаксис</td></tr>
+      <tr><td>Разделы «Основы»</td><td>Переменные, типы, функции, управляющие конструкции</td></tr>
+      <tr><td>Разделы «Владение»</td><td>Главная особенность Rust: ownership, заимствование, срезы</td></tr>
+      <tr><td>Разделы «Типы данных»</td><td>Структуры, перечисления, коллекции, дженерики и трейты</td></tr>
+      <tr><td>Разделы «Практика»</td><td>Ошибки, модули, шпаргалка по синтаксису</td></tr>
+    </table>
+    
+    <div class="note">
+      <p><b>Совет.</b> Каждый пример можно скопировать и запустить локально:
+      <code>cargo new example && cd example</code>, вставить код в <code>src/main.rs</code>, затем <code>cargo run</code>.
+      Интерактивно — в онлайн-песочнице <code>play.rust-lang.org</code>.</p>
+    </div>
+    
+    <h2>Ключевые моменты</h2>
+    <ul>
+      <li>Rust сочетает скорость C/C++ с гарантиями безопасности на этапе компиляции.</li>
+      <li>Основа языка — система владения, ей посвящены два раздела справочника.</li>
+      <li>Все примеры компилируются стабильной версией Rust (stable).</li>
+    </ul>
+    <div class="pager"><span></span><a class="next" href="installation.html"><span>Далее →</span><b>Установка</b></a></div>
+  </main>
+</div>
+<footer class="site-footer">
+  <p>Учебный проект RolliBow, все права защищены</p>
+</footer>
+</body>
+</html>
