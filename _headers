@@ -1,0 +1,23 @@
+# =============================================================================
+# Политика кэширования для практикума по CDN
+# Формат совместим с Cloudflare Pages и Netlify (файл должен лежать в корне сайта).
+# Порядок: сначала более специфичные правила, затем общие.
+# =============================================================================
+
+# Статика, которая меняется редко, — кэшируем на год (immutable)
+/style.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/image.jpg
+  Cache-Control: public, max-age=31536000, immutable
+
+/favicon.svg
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML-страницы — короткий TTL: контент можно обновить,
+# а кэш всё равно даёт HIT для повторяющихся запросов
+/*.html
+  Cache-Control: public, max-age=300
+
+/index.html
+  Cache-Control: public, max-age=300

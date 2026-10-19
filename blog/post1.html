@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Первая запись блога в подкаталоге /blog/ — лабораторная 1.">
+<title>Первая запись блога — Rust: документация</title>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">🦀 Rust</a>
+    <span class="logo-sub">Документация языка</span>
+    <span class="badge">1.90 · stable</span>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" aria-label="Навигация">
+    <div class="nav-group">
+      <p class="nav-title">Подкаталоги (ЛР 1)</p>
+      <a href="../index.html">← Главная</a>
+      <a href="../about/">О сайте</a>
+      <a href="../blog/post1.html">Блог</a>
+    </div>
+  </nav>
+  <main>
+    <h1>Первая запись блога</h1>
+    <p>Это статическая страница в подкаталоге <code>/blog/</code>. Запись существует для того,
+    чтобы у CDN появились <b>разные пути</b> с одинаковым набором ресурсов:
+    и <code>/blog/post1.html</code>, и <code>/about/</code> тянут один и тот же
+    <code>../style.css</code> — а значит, кэш Edge-сервера переиспользуется между разделами.</p>
+    <h2>Что проверяем в этой записи</h2>
+    <ul>
+      <li>Страница в подкаталоге открывается: <code>/blog/post1.html</code>.</li>
+      <li>Стили применились (значит, <code>../style.css</code> resolved верно).</li>
+      <li>Ссылки возврата на главную работают из любой вложенности.</li>
+    </ul>
+    <h2>Черновик заметок автора</h2>
+    <pre><code class="lang-rust"><span class="kw">fn</span> <span class="fn">main</span>() {
+        <span class="kw">let</span> path = <span class="str">"/blog/post1.html"</span>;
+        <span class="mac">println!</span>(<span class="str">"Запрошен путь: {}"</span>, path); <span class="com">// Edge отдаст из кэша при HIT</span>
+    }</code></pre>
+    <p><a href="../index.html">← Вернуться на главную</a> · <a href="../about/">О сайте →</a></p>
+  </main>
+</div>
+<footer class="site-footer">
+  <p>Учебный проект для практикума по CDN · 15 страниц · 1 CSS-файл · 0 JavaScript</p>
+</footer>
+</body>
+</html>

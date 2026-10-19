@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Страница «О сайте» в подкаталоге /about/ — лабораторная 1.">
+<title>О сайте — Rust: документация</title>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">🦀 Rust</a>
+    <span class="logo-sub">Документация языка</span>
+    <span class="badge">1.90 · stable</span>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" aria-label="Навигация">
+    <div class="nav-group">
+      <p class="nav-title">Подкаталоги (ЛР 1)</p>
+      <a href="../index.html">← Главная</a>
+      <a href="../about/">О сайте</a>
+      <a href="../blog/post1.html">Блог</a>
+    </div>
+  </nav>
+  <main>
+    <h1>О сайте</h1>
+    <p>Это страница «О сайте» в подкаталоге <code>/about/</code>. Она лежит на один уровень
+    ниже корня, поэтому все ресурсы подключает <b>относительными путями</b>:</p>
+    <table>
+      <tr><th>Ресурс</th><th>Правильно из подкаталога</th><th>Неправильно</th></tr>
+      <tr><td>Стили</td><td><code>../style.css</code></td><td><code>/style.css</code></td></tr>
+      <tr><td>Иконка</td><td><code>../favicon.svg</code></td><td><code>/favicon.svg</code></td></tr>
+      <tr><td>Ссылка на главную</td><td><code>../index.html</code></td><td><code>/index.html</code></td></tr>
+      <tr><td>Картинка</td><td><code>../image.jpg</code></td><td><code>/image.jpg</code></td></tr>
+    </table>
+    <figure>
+      <img src="../image.jpg" alt="Талисман Rust переносит значение из стека в кучу">
+      <figcaption>Картинка из корня сайта, подключена как <code>../image.jpg</code></figcaption>
+    </figure>
+    <p>Абсолютные пути с ведущим слэшем ломаются, когда сайт размещён не в корне домена
+    (например, в подкаталоге проекта на GitHub Pages), — отсюда правило «всегда <code>../</code>».</p>
+    <p><a href="../index.html">← Вернуться на главную</a> · <a href="../blog/post1.html">В блог →</a></p>
+  </main>
+</div>
+<footer class="site-footer">
+  <p>Учебный проект для практикума по CDN · 15 страниц · 1 CSS-файл · 0 JavaScript</p>
+</footer>
+</body>
+</html>

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -10,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="site-header">
@@ -55,14 +54,21 @@
   </nav>
   <main>
     <h1>Rust — документация языка</h1>
-    <p class="lead">Краткий справочник по языку <b>Rust</b> - системному языку программирования.</p>
+    <p class="lead">Краткий справочник по языку <b>Rust</b> — системному языку программирования,
+    который гарантирует безопасность памяти без сборщика мусора. 15 разделов,
+    примеры кода и шпаргалка — всё, что нужно для быстрого старта.</p>
     
     <figure>
       <img src="image.jpg" alt="Талисман Rust переносит значение из стека в кучу">
       <figcaption>Рис. 1. Талисман переносит значение: память живёт, пока жив её владелец</figcaption>
     </figure>
-
-    <h2>Почему стоит выбрать Rust</h2>
+    
+    <nav class="subnav">
+      <a href="about/">О сайте</a> |
+      <a href="blog/post1.html">Блог</a>
+    </nav>
+    
+    <h2>Почему Rust</h2>
     <ul>
       <li><b>Производительность.</b> Компилируемый язык без рантайма и сборщика мусора — уровень C/C++.</li>
       <li><b>Безопасность памяти.</b> Система владения (ownership) отлавливает гонки данных и висячие указатели на этапе компиляции.</li>
@@ -106,7 +112,7 @@
   </main>
 </div>
 <footer class="site-footer">
-  <p>Учебный проект RolliBow, все права защищены</p>
+  <p>Учебный проект для практикума по CDN · 15 страниц · 1 CSS-файл · 0 JavaScript</p>
 </footer>
 </body>
 </html>
