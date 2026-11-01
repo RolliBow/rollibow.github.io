@@ -1,10 +1,11 @@
+
 /* ==========================================================================
    Документация Rust — стиль учебного сайта (практикум по CDN)
    Один файл на все 15 страниц → идеальная цель для кэширования с длинным TTL.
    ========================================================================== */
 
 :root {
-  --bg: lightcoral;
+  --bg: #ffffff;
   --bg-alt: #f6f7f9;
   --fg: #24292f;
   --fg-muted: #57606a;
@@ -299,3 +300,11 @@ figcaption {
   font-weight: 600;
 }
 .subnav a:hover { text-decoration: underline; }
+
+/* ---------- Видео на главной ---------- */
+figure video {
+  max-width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+}
